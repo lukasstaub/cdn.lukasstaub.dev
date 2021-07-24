@@ -1,6 +1,6 @@
-require("dotenv").config();
+//require("dotenv").config();
 const express = require("express");
-const helmet = require("helmet");
+const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const knex = require("./knex.js");
 
@@ -13,8 +13,12 @@ app.use(
         limit: "50mb",
     })
 );
-app.use(helmet());
 app.use(cookieParser());
+app.use(
+    cors({
+        origin: "*",
+    })
+);
 
 app.get("/:filename", async (req, res) => {
     const { filename } = req.params;
@@ -32,6 +36,10 @@ app.get("/:filename", async (req, res) => {
     } else {
         return res.sendStatus(404);
     }
+});
+
+app.get("/*", (req, res) => {
+    return res.status(403).end();
 });
 
 app.listen(PORT, () => {
