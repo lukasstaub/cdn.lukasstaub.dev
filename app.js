@@ -1,8 +1,8 @@
-//require("dotenv").config();
+require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
-const knex = require("./knex.js");
+const knex = require("./knex");
 
 const PORT = process.env.PORT || 2395;
 
@@ -38,8 +38,8 @@ app.get("/:filename", async (req, res) => {
     }
 });
 
-app.get("/*", (req, res) => {
-    return res.status(403).end();
+app.get("/*", (_, res) => {
+    return res.sendStatus(403);
 });
 
 app.listen(PORT, () => {
