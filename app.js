@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const cors = require("cors");
-const cookieParser = require("cookie-parser");
+// const cookieParser = require("cookie-parser");
 const knex = require("./knex");
 
 const PORT = process.env.PORT || 2395;
@@ -13,7 +13,7 @@ app.use(
         limit: "50mb",
     })
 );
-app.use(cookieParser());
+// app.use(cookieParser());
 app.use(
     cors({
         origin: "*",
@@ -23,18 +23,22 @@ app.use(
 app.get("/:filename", async (req, res) => {
     const { filename } = req.params;
 
-    const [file] = await knex("files").select("data", "content_type").where("name", "=", filename);
+    try {
+        const [file] = await knex("files").select("data", "content_type").where("name", "=", filename);
 
-    if (file) {
-        var readFile = Buffer.from(file.data);
+        if (file) {
+            var readFile = Buffer.from(file.data);
 
-        res.writeHead(200, {
-            "Content-Type": file.content_type,
-            "Content-Length": readFile.length,
-        });
-        return res.end(readFile);
-    } else {
-        return res.sendStatus(404);
+            res.writeHead(200, {
+                "Content-Type": file.content_type,
+                "Content-Length": readFile.length,
+            });
+            return res.end(readFile);
+        } else {
+            return res.sendStatus(404);
+        }
+    } catch (e) {
+        return res.sendStatus(500);
     }
 });
 
