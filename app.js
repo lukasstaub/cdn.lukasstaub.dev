@@ -8,22 +8,22 @@ const PORT = process.env.PORT || 2395;
 
 const app = express();
 
-app.set("trust proxy", true);
-app.use(async (req, _, next) => {
-    if (process.env.NODE_ENV === "production") {
-        const ip = req.ip;
+// app.set("trust proxy", true);
+// app.use(async (req, _, next) => {
+//     if (process.env.NODE_ENV === "production") {
+//         const ip = req.ip;
 
-        await knex("requests").insert({
-            ip: ip,
-            client: req.headers["user-agent"],
-            method: req.method,
-            url: req.url,
-            source: process.env.PAGE_NAME,
-        });
-    }
+//         await knex("requests").insert({
+//             ip: ip,
+//             client: req.headers["user-agent"],
+//             method: req.method,
+//             url: req.url,
+//             source: process.env.PAGE_NAME,
+//         });
+//     }
 
-    return next();
-});
+//     return next();
+// });
 
 app.use(
     express.json({
