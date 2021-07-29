@@ -4,22 +4,38 @@ const cors = require("cors");
 // const cookieParser = require("cookie-parser");
 const knex = require("./knex");
 
+const fs = require("fs");
+const path = require("path");
+
 const PORT = process.env.PORT || 2395;
 
 const app = express();
 
 app.set("trust proxy", true);
 app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ extended: true }));
 // app.use(cookieParser());
 app.use(cors({ origin: "*" }));
 app.use(async (req, _, next) => {
-    if (process.env.NODE_ENV === "production") {
-        await knex("access_logs").insert({
-            user_agent: req.headers["user-agent"],
-            page_name: process.env.PAGE_NAME,
-            requested_resource: req.path,
-            method: req.method,
-        });
+    if (process.env.NODE_ENV === "production" && !(req.headers["origin"] ? req.headers["origin"].includes("lukasstaub.dev") : false)) {
+        try {
+            await knex("access_logs").insert({
+                user_agent: req.headers["user-agent"],
+                page_name: process.env.RESOURCE_NAME,
+                requested_resource: req.path,
+                method: req.method,
+            });
+        } catch (e) {
+            fs.writeFileSync(
+                path.join(__dirname, "./error.txt"),
+                JSON.stringify({
+                    error: e.toString(),
+                    time: new Date(),
+                    environment: process.env,
+                }),
+                { encoding: "utf-8" }
+            );
+        }
     }
 
     return next();
