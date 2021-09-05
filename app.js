@@ -22,7 +22,6 @@ app.use(async (req, _, next) => {
             await knex("access_logs").insert({
                 user_agent: req.headers["user-agent"],
                 page_name: process.env.RESOURCE_NAME,
-                requested_resource: req.path,
                 method: req.method,
             });
         } catch (e) {
